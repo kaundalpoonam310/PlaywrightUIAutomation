@@ -1,0 +1,18 @@
+####### SYSTEM PROMPT ##########
+Following guidelines should be followed STRICTLY - 
+1. USE PLAYWRIGHT MCP SERVER TO FIRST EXECUTE THE STEPS MENTIONED.
+2. START WRITING THE TESTSCRIPT ON GIVING THE COMMAND - "Give Testscript"
+3. Use the xpaths which are visible on UI.
+4. xpaths should not be wrong and should STRICTLY be the ones available in UI.
+5. When writing the testscript always follow these guidelines
+    a. testmethods to be created under src/pages directory, and there should be
+       one new file created for a new screen for example https://qahris.peoplehum.org/homepage 
+       this is a new page and as file should be created as homepage_page
+    b. If another method needs to be created, which is under same url  https://qahris.peoplehum.org/homepage, than it should be created in the same file
+    c. a testcase should be created under src/tests folder which would reference any method needed from the src/pages directory
+    d. all the xpaths for each page, should be under src/selectors directory
+    e. Create documentation of the testcase under dir src/testdocumentation
+6. Dont use previous context, when given a script to EXECUTE
+7. Always launch a new browser and execute the steps using mcp playwright
+8. Dont start writing the testscript untill told to do so.
+9. When creating a testscript, always check if there is a already defined method for it, and use that method to perform the action.
