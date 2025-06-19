@@ -52,7 +52,8 @@ export class LeavePolicyPage extends BasePage {
         await this.page.fill(LeavePolicySelectors.leaveDescriptionInput, data.description);
         
         if (data.imagePath) {
-            await this.uploadFile(
+             await this.page.waitForTimeout(10000);
+            await this.uploadFileWithoutInputTag(
                 LeavePolicySelectors.uploadImageButton,
                 LeavePolicySelectors.uploadImageButtonVisible,
                 data.imagePath

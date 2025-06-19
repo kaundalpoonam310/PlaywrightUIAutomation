@@ -6,6 +6,8 @@ export class BasePage {
 
     constructor(page: Page) {
         this.page = page;
+
+        
     }
 
     /**
@@ -19,6 +21,13 @@ export class BasePage {
         await this.page.click(BaseSelectors.signInButton);
         // Wait for navigation to complete
         await this.page.waitForURL(/.*homepage.*/);
+    }
+
+    async logout(email: string, password: string) {
+        await this.page.fill(BaseSelectors.businessEmail, email);
+        await this.page.fill(BaseSelectors.password, password);
+        await this.page.click(BaseSelectors.signInButton);
+    
     }
 
     /**
@@ -94,5 +103,20 @@ export class BasePage {
             console.error('File upload failed:', error);
             throw error;
         }
+    }
+
+    async uploadFileWithoutInputTag(fileSelector: string, visibleButtonSelector: string, filePath: string){
+        try{
+            this.page.on('filechooser',async(fileChooser)=>{
+                // await fileChooser.isMultiple();
+                await fileChooser.setFiles(filePath);
+            })
+
+            await this.page.click(".leave-category-uploader .my-drop-zone", {force: true})
+        }catch (error) {
+            console.error('File upload failed:', error);
+            throw error;
+        }
+
     }
 }
