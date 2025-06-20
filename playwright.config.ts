@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  globalSetup: require.resolve('./globalSetup'),
-  globalTeardown: require.resolve('./globalTeardown'),
+  globalSetup: './src/utils/globalSetup',
+  globalTeardown: './src/utils/globalTeardown',
   testDir: './src/tests',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
@@ -12,7 +12,7 @@ export default defineConfig({
   use: {
     baseURL: 'https://qahris.peoplehum.org',
     ignoreHTTPSErrors: true,
-    proxy: {
+   proxy: {
     server: 'http://localhost:8080'
     },
     trace: 'on-first-retry',
