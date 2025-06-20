@@ -1,0 +1,12 @@
+/homepage
+/organization/people/list
+/organization/team
+/organization/pending-invitee/list
+/organization/people/profile/self/profile
+/organization/people/profile/13800/document?tabId=10&active_bucket=USER_DOCUMENT
+/organization/people/profile/13800/document?tabId=10&active_bucket=REQUESTED_DOCUMENTS
+/organization/people/profile/13800/profile
+/organization/people/profile/13800/projects?tabId=2
+/organization/people/profile/13800/background?tabId=3
+/organization/people/profile/13800/finance?tabId=4
+/organization/people/profile/13800/assets?tabId=5

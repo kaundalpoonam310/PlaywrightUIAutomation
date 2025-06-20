@@ -1,0 +1,78 @@
+// src/utils/mailHogUtil.ts
+
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import { Buffer } from 'buffer';
+
+const MAILHOG_BASE_URL = 'http://localhost:8025'; // Replace with actual URL
+const PDF_ATTACHMENT_REGEX = /\.pdf[\r\n0-9a-zA-Z+=/]+[\r\n]/g;
+
+export type EmailModel = {
+  subject: string;
+  body: string;
+  recipients: string[];
+  ccrecipients?: string[];
+  attachment?: string[];
+  createdAt?: Date;
+};
+
+// Get all matching messages by subject & receiver
+export async function fetchMessages(subject: string, receiver: string): Promise<EmailModel[]> {
+  const bySubjectTotal = await getMessageCount('containing', subject);
+  const byReceiverTotal = await getMessageCount('to', receiver);
+  const filterKind = bySubjectTotal <= byReceiverTotal ? 'containing' : 'to';
+  const query = filterKind === 'containing' ? subject : receiver;
+  const count = Math.min(bySubjectTotal, byReceiverTotal);
+  const emails: EmailModel[] = [];
+
+  for (let i = 0; i < count; i += 50) {
+    const res = await axios.get(`${MAILHOG_BASE_URL}/api/v2/search`, {
+      params: { kind: filterKind, query, start: i, limit: 50 },
+    });
+    const ids: string[] = res.data.items.map((item: any) => item.ID);
+
+    for (const id of ids) {
+      const messageRes = await axios.get(`${MAILHOG_BASE_URL}/api/v1/messages/${id}`);
+      const data = messageRes.data;
+
+      const email: EmailModel = {
+        subject: data.Content?.Headers?.Subject?.[0] || '',
+        body: data.Content?.Body || '',
+        recipients: data.Content?.Headers?.To || [],
+        ccrecipients: data.Content?.Headers?.Cc || [],
+        attachment: [],
+        createdAt: new Date(data.Created),
+      };
+
+      if (email.body.includes('Content-Type: application/pdf')) {
+        const matches = email.body.match(PDF_ATTACHMENT_REGEX);
+        if (matches) {
+          for (const raw of matches) {
+            const clean = raw.replace(/\r\n/g, '').replace('.pdf', '');
+            const buffer = Buffer.from(clean, 'base64');
+            const filePath = path.join(__dirname, `../../downloads/email_${Math.floor(Math.random() * 1000)}.pdf`);
+            fs.writeFileSync(filePath, buffer);
+            email.attachment?.push(filePath);
+          }
+        }
+      }
+
+      emails.push(email);
+    }
+  }
+
+  return emails;
+}
+
+async function getMessageCount(kind: 'containing' | 'to', query: string): Promise<number> {
+  try {
+    const res = await axios.get(`${MAILHOG_BASE_URL}/api/v2/search`, {
+      params: { kind, query, limit: 1 },
+    });
+    return res.data.total || 0;
+  } catch (err) {
+    console.error(`Failed to fetch count for ${kind}=${query}:`, err);
+    return 0;
+  }
+}
